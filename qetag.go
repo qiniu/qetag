@@ -28,6 +28,7 @@ func CalSha1(r io.Reader) []byte {
 
 func GetEtag(filename string) (etag string, err error) {
 	f, err := os.Open(filename)
+	defer f.Close()
 	if err != nil {
 		log.Println("Open file error : ", err)
 		return
