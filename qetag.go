@@ -1,26 +1,26 @@
 package main
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"bytes"
 	"crypto/sha1"
 	"encoding/base64"
-	"fmt"
-	"io"
-	"log"
-	"os"
 )
 
 const (
 	BLOCK_BITS = 22 // Indicate that the blocksize is 4M
+	BLOCK_SIZE = 1 << BLOCK_BITS
 )
 
-// To get how many blocks does the file has.
 func BlockCount(fsize int64) int {
-	blockMask := int64((1 << BLOCK_BITS) - 1)
-	return int((fsize + blockMask) >> BLOCK_BITS)
+
+	return int((fsize + (BLOCK_SIZE-1)) >> BLOCK_BITS)
 }
 
 func CalSha1(r io.Reader) (sha1Code []byte, err error) {
+
 	h := sha1.New()
 	_, err = io.Copy(h, r)
 	if err != nil {
@@ -31,6 +31,7 @@ func CalSha1(r io.Reader) (sha1Code []byte, err error) {
 }
 
 func GetEtag(filename string) (etag string, err error) {
+
 	f, err := os.Open(filename)
 	if err != nil {
 		return
@@ -57,7 +58,7 @@ func GetEtag(filename string) (etag string, err error) {
 		sha1Buf = append(sha1Buf, 0x96)
 		sha1BlockBuf := make([]byte, 0, blockCnt * 20)
 		for i := 0; i < blockCnt; i ++ {
-			body := io.LimitReader(f, 1 << BLOCK_BITS)
+			body := io.LimitReader(f, BLOCK_SIZE)
 			sha1Code, err = CalSha1(body)
 			if err != nil {
 				return
@@ -65,11 +66,7 @@ func GetEtag(filename string) (etag string, err error) {
 			sha1BlockBuf = append(sha1BlockBuf,sha1Code...)
 		}
 		tmpBuf := bytes.NewBuffer(sha1BlockBuf)
-		var sha1Final []byte
-		sha1Final, err = CalSha1(tmpBuf)
-		if err != nil {
-			return
-		}
+		sha1Final, _ := CalSha1(tmpBuf)
 		sha1Buf = append(sha1Buf, sha1Final...)
 	}
 	etag = base64.URLEncoding.EncodeToString(sha1Buf)
@@ -78,15 +75,15 @@ func GetEtag(filename string) (etag string, err error) {
 
 func main() {
 
-	usage := `usage : qetag <filename>`
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, usage)
+		fmt.Fprintln(os.Stderr, `Usage: qetag <filename>`)
 		return
 	}
 	etag, err := GetEtag(os.Args[1])
 	if err != nil {
-		log.Println("Calculate etag failed : ", err)
+		fmt.Fprintln(os.Stderr, "Calculate etag failed : ", err)
 		return
 	}
 	fmt.Println(etag)
 }
+

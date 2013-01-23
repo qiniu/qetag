@@ -1,5 +1,9 @@
 all:
-	go build -o qetag
+	go build
+
+install:
+	go install
 	
 clean:
-	rm qetag
+	go clean
+
