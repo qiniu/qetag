@@ -1,5 +1,5 @@
 all:
-	go build -o qetg
+	go build -o qetag
 	
 clean:
-	rm qetg
+	rm qetag
