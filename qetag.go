@@ -81,7 +81,7 @@ func main() {
 	}
 	etag, err := GetEtag(os.Args[1])
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Calculate etag failed : ", err)
+		fmt.Fprintln(os.Stderr, err)
 		return
 	}
 	fmt.Println(etag)
