@@ -22,17 +22,21 @@ func BlockCount(fsize int64) int {
 
 func CalSha1(r io.Reader) []byte {
 	h := sha1.New()
-	io.Copy(h, r)
+	_, err := io.Copy(h, r)
+	if err != nil {
+		log.Println("Calculate sha1 error: ", err)
+		return nil
+	}
 	return h.Sum(nil)
 }
 
 func GetEtag(filename string) (etag string, err error) {
 	f, err := os.Open(filename)
-	defer f.Close()
 	if err != nil {
 		log.Println("Open file error : ", err)
 		return
 	}
+	defer f.Close()
 	fi, err := f.Stat()
 	if err != nil {
 		log.Println(err)
@@ -67,12 +71,13 @@ func main() {
 
 	usage := `usage : qetag <filename>`
 	if len(os.Args) < 2 {
-		fmt.Println(usage)
+		fmt.Fprintln(os.Stderr, usage)
 		return
 	}
 	etag, err := GetEtag(os.Args[1])
 	if err != nil {
 		log.Println("Calculate etag failed : ", err)
+		return
 	}
 	fmt.Println(etag)
 }
