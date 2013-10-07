@@ -19,15 +19,14 @@ func BlockCount(fsize int64) int {
 	return int((fsize + (BLOCK_SIZE-1)) >> BLOCK_BITS)
 }
 
-func CalSha1(r io.Reader) (sha1Code []byte, err error) {
+func CalSha1(b []byte, r io.Reader) ([]byte, error) {
 
 	h := sha1.New()
-	_, err = io.Copy(h, r)
+	_, err := io.Copy(h, r)
 	if err != nil {
-		return
+		return nil, err
 	}
-	sha1Code = h.Sum(nil)
-	return 
+	return h.Sum(b), nil
 }
 
 func GetEtag(filename string) (etag string, err error) {
@@ -42,32 +41,28 @@ func GetEtag(filename string) (etag string, err error) {
 	if err != nil {
 		return
 	}
+
 	fsize := fi.Size()
 	blockCnt := BlockCount(fsize)
 	sha1Buf := make([]byte, 0, 21)
 
-	var sha1Code []byte
 	if blockCnt <= 1 { // file size <= 4M
 		sha1Buf = append(sha1Buf, 0x16)
-		sha1Code, err = CalSha1(f) 
+		sha1Buf, err = CalSha1(sha1Buf, f) 
 		if err != nil {
 			return
 		}
-		sha1Buf = append(sha1Buf, sha1Code...)
 	} else { // file size > 4M
 		sha1Buf = append(sha1Buf, 0x96)
 		sha1BlockBuf := make([]byte, 0, blockCnt * 20)
 		for i := 0; i < blockCnt; i ++ {
 			body := io.LimitReader(f, BLOCK_SIZE)
-			sha1Code, err = CalSha1(body)
+			sha1BlockBuf, err = CalSha1(sha1BlockBuf, body)
 			if err != nil {
 				return
 			}
-			sha1BlockBuf = append(sha1BlockBuf,sha1Code...)
 		}
-		tmpBuf := bytes.NewBuffer(sha1BlockBuf)
-		sha1Final, _ := CalSha1(tmpBuf)
-		sha1Buf = append(sha1Buf, sha1Final...)
+		sha1Buf, _ = CalSha1(sha1Buf, bytes.NewReader(sha1BlockBuf))
 	}
 	etag = base64.URLEncoding.EncodeToString(sha1Buf)
 	return
