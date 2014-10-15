@@ -28,13 +28,11 @@ public class QETag {
 		String etag = "";
 		File file = new File(fileName);
 		if (file.exists() && file.isFile() && file.canRead()) {
-			int fileLength = (int) file.length();
+			long fileLength = file.length();
 			FileInputStream inputStream = new FileInputStream(file);
 			if (fileLength <= SLICE_SIZE) {
-
-				byte[] fileData = new byte[fileLength];
-				inputStream.read(fileData, 0, fileLength);
-
+				byte[] fileData = new byte[(int) fileLength];
+				inputStream.read(fileData, 0, (int) fileLength);
 				byte[] sha1Data = sha1(fileData);
 				int sha1DataLen = sha1Data.length;
 				byte[] hashData = new byte[sha1DataLen + 1];
@@ -42,7 +40,7 @@ public class QETag {
 				hashData[0] = 0x16;
 				etag = urlSafeBase64Encode(hashData);
 			} else {
-				int sliceCount = (int) fileLength / SLICE_SIZE;
+				int sliceCount = (int) (fileLength / SLICE_SIZE);
 				if (fileLength % SLICE_SIZE != 0) {
 					sliceCount += 1;
 				}
