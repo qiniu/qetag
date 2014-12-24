@@ -53,6 +53,9 @@ function getEtag(buffer,callback){
 	}
 
 	function calcEtag(){
+		if(!sha1String.length){
+			return 'Fto5o-5ea0sNMlW_75VgGJCv2AcJ';
+		}
 		var sha1Buffer = Buffer.concat(sha1String,blockCount * 20);
 
 		// 如果大于4M，则对各个块的sha1结果再次sha1
@@ -67,7 +70,7 @@ function getEtag(buffer,callback){
 		);
 
 		return sha1Buffer.toString('base64')
-			.replace(/\//g,'_').replace(/\+/g,'_');
+			.replace(/\//g,'_').replace(/\+/g,'-');
 
 	}
 
