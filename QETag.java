@@ -5,8 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.apache.commons.codec.binary.Base64;
+import javax.xml.bind.DatatypeConverter;
 
 public class QETag {
 	private final int CHUNK_SIZE = 1 << 22;
@@ -17,8 +16,7 @@ public class QETag {
 	}
 
 	public String urlSafeBase64Encode(byte[] data) {
-		byte[] encodedData = Base64.encodeBase64(data);
-		String encodedString = new String(encodedData);
+                String encodedString = DatatypeConverter.printBase64Binary(data);
 		encodedString = encodedString.replace('+', '-').replace('/', '_');
 		return encodedString;
 	}
