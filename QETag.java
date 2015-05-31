@@ -16,7 +16,7 @@ public class QETag {
 	}
 
 	public String urlSafeBase64Encode(byte[] data) {
-                String encodedString = DatatypeConverter.printBase64Binary(data);
+		String encodedString = DatatypeConverter.printBase64Binary(data);
 		encodedString = encodedString.replace('+', '-').replace('/', '_');
 		return encodedString;
 	}
