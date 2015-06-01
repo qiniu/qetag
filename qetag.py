@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# 最新版本 https://github.com/qiniu/python-sdk/blob/master/qiniu/utils.py#L129
+
 import os
 import sys
 import base64
