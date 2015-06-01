@@ -1,5 +1,12 @@
 package com.qiniu;
 
+/*
+java 最新版本 
+https://github.com/qiniu/java-sdk/blob/master/src/main/java/com/qiniu/util/Etag.java
+android 最新版本
+https://github.com/qiniu/android-sdk/blob/master/library/src/main/java/com/qiniu/android/utils/Etag.java
+*/
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
