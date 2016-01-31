@@ -73,7 +73,7 @@ sha1_list(File, Num_thread, Num_blocks_in_rawblock) ->
         Read_start = Off * (Num_blocks_in_rawblock + 1),
         Read_off = Read_start + Num_blocks_in_rawblock,
         SHA1_list_rawblock = get_rawblock_sha1_list(File, lists:seq(Read_start, Read_off), <<>>),
-        [{Off, SHA1_list_rawblock}]
+        {Off, SHA1_list_rawblock}
           end, lists:seq(0, Num_thread)).
 
 
@@ -81,7 +81,7 @@ sha1_list_last(File, Num_thread, Start)->
     upmap(fun (Off)->
         {ok, Fd_bs} = file:pread(File, (Off + Start) * ?BLOCK_SIZE, ?BLOCK_SIZE),
         SHA1 = crypto:hash(sha, Fd_bs),
-        [{Off, SHA1}]
+        {Off, SHA1}
           end, lists:seq(0, Num_thread)).
 
 
@@ -97,7 +97,7 @@ upmap(F, L) ->
     Parent = self(),
     Ref = make_ref(),
     [receive {Ref, Result} ->
-        Result ++ []
+        Result
      end
         || _ <- [spawn(fun() -> Parent ! {Ref, F(X)} end) || X <- L]].
 
@@ -105,7 +105,7 @@ upmap(F, L) ->
 combine_sha1(SHA1_BIN, []) ->
     SHA1_BIN;
 combine_sha1(SHA1_bin, [H|T]) ->
-    [{_, RAW_SHA1}] = H,
+    {_, RAW_SHA1} = H,
     SHA1_BIN = erlang:iolist_to_binary([SHA1_bin, RAW_SHA1]),
     combine_sha1(SHA1_BIN, T).
 
