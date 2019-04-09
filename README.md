@@ -10,7 +10,7 @@ qetag 是一个计算文件在七牛云存储上的 hash 值（也是文件下�
 
 为何需要公开 hash/etag 算法？这个和 “消重” 问题有关，详细见：
 
-* http://kb.qiniu.com/53tubk96
+* https://developer.qiniu.com/kodo/kb/1365/how-to-avoid-the-users-to-upload-files-with-the-same-key
 * http://segmentfault.com/q/1010000000315810
 
 为何在 sha1 值前面加一个byte的标记位(0x16或0x96）？
